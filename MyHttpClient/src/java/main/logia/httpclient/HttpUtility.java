@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
-import logia.httpclient.response.HttpResponseListener;
+import logia.httpclient.response.listener.HttpResponseListener;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -82,7 +82,7 @@ public abstract class HttpUtility {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public HttpUtility(HttpHost __httpHost, String __requestURL, Map<String, String> __headers, Map<String, String> _parameters,
-			HttpResponseListener<?> __listener) throws IOException {
+	        HttpResponseListener<?> __listener) throws IOException {
 		this.httpHost = __httpHost;
 		this.requestURL = __requestURL;
 		this.headers = __headers;
@@ -103,8 +103,8 @@ public abstract class HttpUtility {
 	 * @param __listener the __listener
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public HttpUtility(String __requestURL, Map<String, String> __headers, Map<String, String> __parameters, HttpResponseListener __listener)
-			throws IOException {
+	public HttpUtility(String __requestURL, Map<String, String> __headers, Map<String, String> __parameters, HttpResponseListener<?> __listener)
+	        throws IOException {
 		this.requestURL = __requestURL;
 		this.headers = __headers;
 		this.params = __parameters;
@@ -218,5 +218,14 @@ public abstract class HttpUtility {
 	 * Sets the parameters, encode them using URLEncoder.
 	 */
 	protected abstract void setParameters();
+
+	/**
+	 * Gets the response listener.
+	 *
+	 * @return the response listener
+	 */
+	public HttpResponseListener<?> getResponseListener() {
+		return this.responseListener;
+	}
 
 }

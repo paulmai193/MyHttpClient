@@ -1,4 +1,4 @@
-package logia.httpclient.response;
+package logia.httpclient.response.listener;
 
 import java.io.IOException;
 
@@ -20,11 +20,10 @@ public interface HttpResponseListener<T> {
 	/**
 	 * On response.
 	 *
-	 * @param _httpUtility the _http utility
-	 * @return the t
+	 * @param __httpUtility the HTTP utility
 	 * @throws UnsupportedOperationException the unsupported operation exception
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public T onResponse(HttpUtility _httpUtility) throws UnsupportedOperationException, IOException;
+	public void onResponse(HttpUtility __httpUtility) throws UnsupportedOperationException, IOException;
 
 }

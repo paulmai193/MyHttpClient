@@ -6,7 +6,7 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import logia.httpclient.response.HttpResponseListener;
+import logia.httpclient.response.listener.HttpResponseListener;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpGet;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import logia.httpclient.response.HttpResponseListener;
+import logia.httpclient.response.listener.HttpResponseListener;
 
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpHost;
