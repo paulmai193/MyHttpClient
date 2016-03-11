@@ -15,7 +15,7 @@ import org.apache.commons.io.IOUtils;
  * @author Paul Mai
  */
 
-public class DefaultHttpResponse implements HttpResponseListener<DefaultResponseObject> {
+public class DefaultHttpResponseListener implements HttpResponseListener<DefaultResponseObject> {
 
 	private DefaultResponseObject response;
 
@@ -26,6 +26,7 @@ public class DefaultHttpResponse implements HttpResponseListener<DefaultResponse
 	 */
 	@Override
 	public void onResponse(HttpUtility __httpUtility) throws UnsupportedOperationException, IOException {
+		this.response = new DefaultResponseObject();
 		this.response.setResponseCode(__httpUtility.getHttpResponse().getStatusLine().getStatusCode());
 		try (InputStream _inputStream = __httpUtility.getHttpResponse().getEntity().getContent();) {
 			this.response.setResponseContent(IOUtils.toString(_inputStream, Charsets.UTF_8));
