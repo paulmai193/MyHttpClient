@@ -1,7 +1,13 @@
+/*
+ * 
+ */
 package logia.httpclient;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,17 +15,20 @@ import java.util.concurrent.TimeoutException;
 
 import logia.httpclient.response.listener.HttpResponseListener;
 
-import org.apache.commons.codec.Charsets;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
 
 /**
@@ -45,7 +54,7 @@ public abstract class HttpUtility {
 	protected Map<String, String>           headers;
 
 	/** The http client. */
-	protected HttpClient                    httpClient;
+	protected CloseableHttpClient           httpClient;
 
 	/** The http context. */
 	protected HttpClientContext             httpContext;
@@ -80,16 +89,25 @@ public abstract class HttpUtility {
 	 * @param _parameters the params
 	 * @param __listener the __listener
 	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
+	 * @throws KeyManagementException the key management exception
 	 */
 	public HttpUtility(HttpHost __httpHost, String __requestURL, Map<String, String> __headers, Map<String, String> _parameters,
-	        HttpResponseListener<?> __listener) throws IOException {
+	        HttpResponseListener<?> __listener) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 		this.httpHost = __httpHost;
 		this.requestURL = __requestURL;
 		this.headers = __headers;
 		this.params = _parameters;
 
 		this.httpContext = HttpClientContext.create();
-		this.httpClient = HttpClientBuilder.create().build();
+
+		SSLContextBuilder builder = SSLContextBuilder.create();
+		builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
+		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+		// this.httpClient = HttpClients.createDefault(); // HttpClientBuilder.create().build();
 
 		this.responseListener = __listener;
 	}
@@ -102,15 +120,24 @@ public abstract class HttpUtility {
 	 * @param __parameters the params
 	 * @param __listener the __listener
 	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
+	 * @throws KeyManagementException the key management exception
 	 */
 	public HttpUtility(String __requestURL, Map<String, String> __headers, Map<String, String> __parameters, HttpResponseListener<?> __listener)
-	        throws IOException {
+	        throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 		this.requestURL = __requestURL;
 		this.headers = __headers;
 		this.params = __parameters;
 
 		this.httpContext = HttpClientContext.create();
-		this.httpClient = HttpClientBuilder.create().build();
+
+		SSLContextBuilder builder = SSLContextBuilder.create();
+		builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
+		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+		// this.httpClient = HttpClients.createSystem(); // HttpClientBuilder.create().build();
 
 		this.responseListener = __listener;
 	}
@@ -226,6 +253,16 @@ public abstract class HttpUtility {
 	 */
 	public HttpResponseListener<?> getResponseListener() {
 		return this.responseListener;
+	}
+
+	/**
+	 * Close.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @see java.io.Closeable#close()
+	 */
+	public void close() throws IOException {
+		this.httpClient.close();
 	}
 
 }

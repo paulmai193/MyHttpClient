@@ -6,7 +6,7 @@ import java.io.InputStream;
 import logia.httpclient.HttpUtility;
 import logia.httpclient.response.listener.HttpResponseListener;
 
-import org.apache.commons.codec.Charsets;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 
 /**

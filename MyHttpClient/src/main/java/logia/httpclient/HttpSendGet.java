@@ -3,6 +3,9 @@ package logia.httpclient;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -30,9 +33,12 @@ public class HttpSendGet extends HttpUtility {
 	 * @param __parameters the params
 	 * @param __listener the __listener
 	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws KeyManagementException the key management exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
 	 */
 	public HttpSendGet(HttpHost __host, String __requestURL, Map<String, String> __headers, Map<String, String> __parameters,
-			HttpResponseListener<?> __listener) throws IOException {
+	        HttpResponseListener<?> __listener) throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		super(__host, __requestURL, __headers, __parameters, __listener);
 		this.setParameters();
 		this.httpRequest = new HttpGet(this.requestURL);
@@ -51,9 +57,12 @@ public class HttpSendGet extends HttpUtility {
 	 * @param __parameters the __parameters
 	 * @param __listener the __listener
 	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws KeyManagementException the key management exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
 	 */
 	public HttpSendGet(String __requestURL, Map<String, String> __headers, Map<String, String> __parameters, HttpResponseListener<?> __listener)
-			throws IOException {
+	        throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		super(__requestURL, __headers, __parameters, __listener);
 		this.setParameters();
 		if (this.requestParams.length() > 0) {
