@@ -33,19 +33,12 @@
 		
 	<properties>
 		<log4j.version>1.2.17</log4j.version>
-		<http-client.version>4.5</http-client.version>
+		<http-client.version>4.5.2</http-client.version>
 		<logia-utilities.version>0.1.3</logia-utilities.version>
 		<commons-io.version>2.4</commons-io.version>
 	</properties>
 	
 	<dependencies>
-		<!-- Apache IO -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons-io.version}</version>
-		</dependency>
-		<!-- end Apache IO -->
 		<!-- Logging -->
 		<dependency>
 			<groupId>log4j</groupId>
@@ -73,4 +66,13 @@
 		</dependency>
 		<!-- end Utility -->
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.10</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
