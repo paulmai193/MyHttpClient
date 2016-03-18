@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import logia.httpclient.response.listener.HttpResponseListener;
 
 import org.apache.commons.io.Charsets;
@@ -105,7 +108,15 @@ public abstract class HttpUtility {
 		SSLContextBuilder builder = SSLContextBuilder.create();
 		builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+
+			@Override
+			public boolean verify(String __hostname, SSLSession __session) {
+				// TODO Auto-generated method stub
+				// Accept all hostname
+				return true;
+			}
+		});
 		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 		// this.httpClient = HttpClients.createDefault(); // HttpClientBuilder.create().build();
 
@@ -135,7 +146,15 @@ public abstract class HttpUtility {
 		SSLContextBuilder builder = SSLContextBuilder.create();
 		builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+
+			@Override
+			public boolean verify(String __hostname, SSLSession __session) {
+				// TODO Auto-generated method stub
+				// Accept all hostname
+				return true;
+			}
+		});
 		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 		// this.httpClient = HttpClients.createSystem(); // HttpClientBuilder.create().build();
 
