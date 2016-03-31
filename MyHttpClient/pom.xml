@@ -5,7 +5,7 @@
 	<artifactId>logia-httpclient</artifactId>
 	<version>0.0.1</version>
 	<build>
-		<defaultGoal>source:jar install</defaultGoal>
+		<defaultGoal>clean source:jar install</defaultGoal>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		

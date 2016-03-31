@@ -29,6 +29,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
@@ -112,7 +113,6 @@ public abstract class HttpUtility {
 
 			@Override
 			public boolean verify(String __hostname, SSLSession __session) {
-				// TODO Auto-generated method stub
 				// Accept all hostname
 				return true;
 			}
@@ -150,7 +150,6 @@ public abstract class HttpUtility {
 
 			@Override
 			public boolean verify(String __hostname, SSLSession __session) {
-				// TODO Auto-generated method stub
 				// Accept all hostname
 				return true;
 			}
@@ -224,6 +223,9 @@ public abstract class HttpUtility {
 	 * @param __cookie the new cookie
 	 */
 	public void setCookie(Cookie __cookie) {
+		if (this.cookieStore == null) {
+			this.cookieStore = new BasicCookieStore();
+		}
 		this.cookieStore.addCookie(__cookie);
 		this.httpContext.setCookieStore(this.cookieStore);
 	}
