@@ -9,10 +9,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import logia.httpclient.response.listener.HttpResponseListener;
-
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpGet;
+
+import logia.httpclient.response.listener.HttpResponseListener;
 
 /**
  * The Class HttpSendGet.
@@ -37,16 +37,38 @@ public class HttpSendGet extends HttpUtility {
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyStoreException the key store exception
 	 */
-	public HttpSendGet(HttpHost __host, String __requestURL, Map<String, String> __headers, Map<String, String> __parameters,
-	        HttpResponseListener<?> __listener) throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
-		super(__host, __requestURL, __headers, __parameters, __listener);
+	public HttpSendGet(HttpHost __host, String __requestURL, Map<String, String> __headers,
+	        Map<String, String> __parameters, HttpResponseListener<?> __listener)
+	        throws IOException, KeyManagementException, NoSuchAlgorithmException,
+	        KeyStoreException {
+		this(__host, __requestURL, __headers, __parameters, __listener, -1);
+	}
+
+	/**
+	 * Instantiates a new http send get.
+	 *
+	 * @param __host the host
+	 * @param __requestURL the request URL
+	 * @param __headers the headers
+	 * @param __parameters the parameters
+	 * @param __listener the listener
+	 * @param __timeout the timeout in milisecond
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws KeyManagementException the key management exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
+	 */
+	public HttpSendGet(HttpHost __host, String __requestURL, Map<String, String> __headers,
+	        Map<String, String> __parameters, HttpResponseListener<?> __listener, int __timeout)
+	        throws IOException, KeyManagementException, NoSuchAlgorithmException,
+	        KeyStoreException {
+		super(__host, __requestURL, __headers, __parameters, __listener, __timeout);
 		this.setParameters();
-		this.httpRequest = new HttpGet(this.requestURL);
 		this.setHeaders();
 		if (this.requestParams.length() > 0) {
 			this.requestURL = this.requestURL + "?" + this.requestParams.toString();
 		}
-
+		this.httpRequest = new HttpGet(this.requestURL);
 	}
 
 	/**
@@ -61,9 +83,31 @@ public class HttpSendGet extends HttpUtility {
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyStoreException the key store exception
 	 */
-	public HttpSendGet(String __requestURL, Map<String, String> __headers, Map<String, String> __parameters, HttpResponseListener<?> __listener)
-	        throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
-		super(__requestURL, __headers, __parameters, __listener);
+	public HttpSendGet(String __requestURL, Map<String, String> __headers,
+	        Map<String, String> __parameters, HttpResponseListener<?> __listener)
+	        throws IOException, KeyManagementException, NoSuchAlgorithmException,
+	        KeyStoreException {
+		this(__requestURL, __headers, __parameters, __listener, -1);
+	}
+
+	/**
+	 * Instantiates a new http send get.
+	 *
+	 * @param __requestURL the request URL
+	 * @param __headers the headers
+	 * @param __parameters the parameters
+	 * @param __listener the listener
+	 * @param __timeout the timeout in milisecond
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws KeyManagementException the key management exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
+	 */
+	public HttpSendGet(String __requestURL, Map<String, String> __headers,
+	        Map<String, String> __parameters, HttpResponseListener<?> __listener, int __timeout)
+	        throws IOException, KeyManagementException, NoSuchAlgorithmException,
+	        KeyStoreException {
+		super(__requestURL, __headers, __parameters, __listener, __timeout);
 		this.setParameters();
 		if (this.requestParams.length() > 0) {
 			this.requestURL = this.requestURL + "?" + this.requestParams.toString();
@@ -72,6 +116,9 @@ public class HttpSendGet extends HttpUtility {
 		this.setHeaders();
 	}
 
+	/**
+	 * Sets the parameters.
+	 */
 	/*
 	 * (non-Javadoc)
 	 * 

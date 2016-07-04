@@ -5,18 +5,16 @@ package logia.httpclient;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
-
-import logia.httpclient.response.listener.HttpResponseListener;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -24,6 +22,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -35,6 +34,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
 
+import logia.httpclient.response.listener.HttpResponseListener;
+
 /**
  * The Class HttpUtility.
  * 
@@ -43,46 +44,47 @@ import org.apache.log4j.Logger;
 public abstract class HttpUtility {
 
 	/** The Constant HEADER_CONTENT_TYPE. */
-	public static final String              HEADER_CONTENT_TYPE = "Content-Type";
+	public static final String				HEADER_CONTENT_TYPE	= "Content-Type";
 
 	/** The Constant HEADER_COOKIE. */
-	public static final String              HEADER_COOKIE       = "Cookie";
+	public static final String				HEADER_COOKIE		= "Cookie";
 
 	/** The Constant HEADER_USER_AGENT. */
-	public static final String              HEADER_USER_AGENT   = "User-Agent";
+	public static final String				HEADER_USER_AGENT	= "User-Agent";
 
 	/** The cookie store. */
-	private CookieStore                     cookieStore;
+	private CookieStore						cookieStore;
 
 	/** The headers. */
-	protected Map<String, String>           headers;
+	protected Map<String, String>			headers;
 
 	/** The http client. */
-	protected CloseableHttpClient           httpClient;
+	protected CloseableHttpClient			httpClient;
 
 	/** The http context. */
-	protected HttpClientContext             httpContext;
+	protected HttpClientContext				httpContext;
 
 	/** The http host. */
-	protected HttpHost                      httpHost;
+	protected HttpHost						httpHost;
 
 	/** The http request. */
-	protected HttpRequest                   httpRequest;
+	protected HttpRequest					httpRequest;
 
 	/** The http response. */
-	protected HttpResponse                  httpResponse;
+	protected HttpResponse					httpResponse;
 
 	/** The logger. */
-	protected static final Logger           LOGGER              = Logger.getLogger(HttpUtility.class);
+	protected static final Logger			LOGGER				= Logger
+	        .getLogger(HttpUtility.class);
 
 	/** The params. */
-	protected Map<String, String>           params;
+	protected Map<String, String>			params;
 
 	/** The request url. */
-	protected String                        requestURL;
+	protected String						requestURL;
 
 	/** The response listener. */
-	protected final HttpResponseListener<?> responseListener;
+	protected final HttpResponseListener<?>	responseListener;
 
 	/**
 	 * Instantiates a new http utility.
@@ -91,14 +93,17 @@ public abstract class HttpUtility {
 	 * @param __requestURL the request url
 	 * @param __headers the headers
 	 * @param _parameters the params
-	 * @param __listener the __listener
+	 * @param __listener the listener
+	 * @param __timeout the timeout in milisecond
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyStoreException the key store exception
 	 * @throws KeyManagementException the key management exception
 	 */
-	public HttpUtility(HttpHost __httpHost, String __requestURL, Map<String, String> __headers, Map<String, String> _parameters,
-	        HttpResponseListener<?> __listener) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+	public HttpUtility(HttpHost __httpHost, String __requestURL, Map<String, String> __headers,
+	        Map<String, String> _parameters, HttpResponseListener<?> __listener, int __timeout)
+	        throws IOException, NoSuchAlgorithmException, KeyStoreException,
+	        KeyManagementException {
 		this.httpHost = __httpHost;
 		this.requestURL = __requestURL;
 		this.headers = __headers;
@@ -109,18 +114,43 @@ public abstract class HttpUtility {
 		SSLContextBuilder builder = SSLContextBuilder.create();
 		builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(),
+		        new HostnameVerifier() {
 
-			@Override
-			public boolean verify(String __hostname, SSLSession __session) {
-				// Accept all hostname
-				return true;
-			}
-		});
-		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-		// this.httpClient = HttpClients.createDefault(); // HttpClientBuilder.create().build();
+			        @Override
+			        public boolean verify(String __hostname, SSLSession __session) {
+				        // Accept all hostname
+				        return true;
+			        }
+		        });
+
+		RequestConfig.Builder _configBuilder = RequestConfig.custom();
+		_configBuilder.setConnectionRequestTimeout(__timeout);
+		_configBuilder.setConnectTimeout(__timeout);
+
+		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf)
+		        .setDefaultRequestConfig(_configBuilder.build()).build();
 
 		this.responseListener = __listener;
+	}
+
+	/**
+	 * Instantiates a new http utility.
+	 *
+	 * @param __httpHost the http host
+	 * @param __requestURL the request URL
+	 * @param __headers the headers
+	 * @param _parameters the parameters
+	 * @param __listener the listener
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
+	 * @throws KeyManagementException the key management exception
+	 */
+	public HttpUtility(HttpHost __httpHost, String __requestURL, Map<String, String> __headers,
+	        Map<String, String> _parameters, HttpResponseListener<?> __listener) throws IOException,
+	        NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+		this(__httpHost, __requestURL, __headers, _parameters, __listener, -1);
 	}
 
 	/**
@@ -129,14 +159,17 @@ public abstract class HttpUtility {
 	 * @param __requestURL the request url
 	 * @param __headers the headers
 	 * @param __parameters the params
-	 * @param __listener the __listener
+	 * @param __listener the listener
+	 * @param __timeout the timeout in milisecond
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyStoreException the key store exception
 	 * @throws KeyManagementException the key management exception
 	 */
-	public HttpUtility(String __requestURL, Map<String, String> __headers, Map<String, String> __parameters, HttpResponseListener<?> __listener)
-	        throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+	public HttpUtility(String __requestURL, Map<String, String> __headers,
+	        Map<String, String> __parameters, HttpResponseListener<?> __listener, int __timeout)
+	        throws IOException, NoSuchAlgorithmException, KeyStoreException,
+	        KeyManagementException {
 		this.requestURL = __requestURL;
 		this.headers = __headers;
 		this.params = __parameters;
@@ -146,18 +179,44 @@ public abstract class HttpUtility {
 		SSLContextBuilder builder = SSLContextBuilder.create();
 		builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(),
+		        new HostnameVerifier() {
 
-			@Override
-			public boolean verify(String __hostname, SSLSession __session) {
-				// Accept all hostname
-				return true;
-			}
-		});
-		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-		// this.httpClient = HttpClients.createSystem(); // HttpClientBuilder.create().build();
+			        @Override
+			        public boolean verify(String __hostname, SSLSession __session) {
+				        // Accept all hostname
+				        return true;
+			        }
+		        });
+
+		RequestConfig.Builder _configBuilder = RequestConfig.custom();
+		_configBuilder.setConnectionRequestTimeout(__timeout);
+		_configBuilder.setConnectTimeout(__timeout);
+		_configBuilder.setSocketTimeout(__timeout);
+
+		this.httpClient = HttpClients.custom().setSSLSocketFactory(sslsf)
+		        .setDefaultRequestConfig(_configBuilder.build()).build();
 
 		this.responseListener = __listener;
+	}
+
+	/**
+	 * Instantiates a new http utility.
+	 *
+	 * @param __requestURL the request URL
+	 * @param __headers the headers
+	 * @param __parameters the parameters
+	 * @param __listener the listener
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
+	 * @throws KeyManagementException the key management exception
+	 */
+	public HttpUtility(String __requestURL, Map<String, String> __headers,
+	        Map<String, String> __parameters, HttpResponseListener<?> __listener)
+	        throws IOException, NoSuchAlgorithmException, KeyStoreException,
+	        KeyManagementException {
+		this(__requestURL, __headers, __parameters, __listener, -1);
 	}
 
 	/**
@@ -166,14 +225,17 @@ public abstract class HttpUtility {
 	 * @return the response code
 	 * @throws UnsupportedOperationException the unsupported operation exception
 	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws TimeoutException the timeout exception
+	 * @throws SocketTimeoutException the socket timeout exception
 	 */
-	public void execute() throws UnsupportedOperationException, IOException, TimeoutException {
+	public void execute()
+	        throws UnsupportedOperationException, IOException, SocketTimeoutException {
 		if (this.httpHost != null) {
-			this.httpResponse = this.httpClient.execute(this.httpHost, this.httpRequest, this.httpContext);
+			this.httpResponse = this.httpClient.execute(this.httpHost, this.httpRequest,
+			        this.httpContext);
 		}
 		else {
-			this.httpResponse = this.httpClient.execute((HttpUriRequest) this.httpRequest, this.httpContext);
+			this.httpResponse = this.httpClient.execute((HttpUriRequest) this.httpRequest,
+			        this.httpContext);
 		}
 		this.cookieStore = this.httpContext.getCookieStore();
 

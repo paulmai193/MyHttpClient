@@ -9,10 +9,12 @@ import logia.httpclient.response.impl.DefaultHttpResponseListener;
 
 public final class Test {
 
-	public static void main(String[] args) throws IOException, UnsupportedOperationException, TimeoutException, KeyManagementException,
-	        NoSuchAlgorithmException, KeyStoreException {
+	public static void main(String[] args) throws IOException, UnsupportedOperationException,
+	        TimeoutException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		DefaultHttpResponseListener _listener = new DefaultHttpResponseListener();
-		HttpSendGet _request = new HttpSendGet("https://localhost:8443/ktv/phone/song/suggestsong", null, null, _listener);
+		HttpSendGet _request = new HttpSendGet(
+		        "http://localhost:8080/voohooomain/phone/sns/testtimeout", null, null, _listener,
+		        0);
 		_request.execute();
 		System.out.println(_listener.getResponse().getResponseContent());
 
